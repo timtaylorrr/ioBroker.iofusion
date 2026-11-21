@@ -193,10 +193,13 @@ export const entityList = derived(
 			?.sort()
 			?.map((key) => {
 				const name = getName(undefined, $states?.[key]);
+				// ioFusion: ioBroker object id, used to group the picker like the object tree
+				const iobId = $states?.[key]?.attributes?.iobroker_id as string | undefined;
 				return {
 					id: key,
 					label: name ?? key,
-					hint: name === key ? undefined : key
+					hint: iobId ?? (name === key ? undefined : key),
+					group: iobId ? iobId.split('.').slice(0, -1).join('.') || iobId : undefined
 				};
 			})
 );

@@ -24,6 +24,19 @@ const objects = {
 	'0_userdata.0.flur.bewegung': obj('Flur Bewegung', 'sensor.motion', 'boolean', { write: false }),
 	'0_userdata.0.haustuer.offen': obj('Haustür', 'sensor.door', 'boolean', { write: false })
 };
+// more devices in a realistic tree, to try the grouped entity picker
+Object.assign(objects, {
+	'hm-rpc.0.NEQ1001.1.STATE': obj('Flur Licht', 'switch.light', 'boolean'),
+	'hm-rpc.0.NEQ1001.2.STATE': obj('Flur Spiegel', 'switch.light', 'boolean'),
+	'hm-rpc.0.NEQ2002.1.TEMPERATURE': obj('Bad Temperatur', 'value.temperature', 'number', { write: false, unit: '°C' }),
+	'hm-rpc.0.NEQ2002.1.HUMIDITY': obj('Bad Feuchte', 'value.humidity', 'number', { write: false, unit: '%' }),
+	'zigbee.0.00158d0001.state': obj('Schlafzimmer Lampe', 'switch.light', 'boolean'),
+	'zigbee.0.00158d0001.brightness': obj('Schlafzimmer Helligkeit', 'level.dimmer', 'number', { min: 0, max: 254 }),
+	'zigbee.0.00158d0002.temperature': obj('Garten Temperatur', 'value.temperature', 'number', { write: false, unit: '°C' }),
+	'zigbee.0.00158d0002.battery': obj('Garten Batterie', 'value.battery', 'number', { write: false, unit: '%' }),
+	'shelly.0.shellyplug#AB12.Relay0.Switch': obj('Waschmaschine', 'switch', 'boolean'),
+	'shelly.0.shellyplug#AB12.Relay0.Power': obj('Waschmaschine Leistung', 'value.power', 'number', { write: false, unit: 'W' })
+});
 const values = {
 	'0_userdata.0.wohnzimmer.licht': true,
 	'0_userdata.0.wohnzimmer.dimmer': 40,
@@ -31,7 +44,17 @@ const values = {
 	'0_userdata.0.wohnzimmer.temperatur': 21.4,
 	'0_userdata.0.wohnzimmer.feuchte': 48,
 	'0_userdata.0.flur.bewegung': false,
-	'0_userdata.0.haustuer.offen': false
+	'0_userdata.0.haustuer.offen': false,
+	'hm-rpc.0.NEQ1001.1.STATE': false,
+	'hm-rpc.0.NEQ1001.2.STATE': true,
+	'hm-rpc.0.NEQ2002.1.TEMPERATURE': 23.1,
+	'hm-rpc.0.NEQ2002.1.HUMIDITY': 61,
+	'zigbee.0.00158d0001.state': false,
+	'zigbee.0.00158d0001.brightness': 0,
+	'zigbee.0.00158d0002.temperature': 11.5,
+	'zigbee.0.00158d0002.battery': 87,
+	'shelly.0.shellyplug#AB12.Relay0.Switch': true,
+	'shelly.0.shellyplug#AB12.Relay0.Power': 412
 };
 
 const callbacks = [];

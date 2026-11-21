@@ -30,6 +30,8 @@
 			label: string;
 			hint?: string;
 			icon?: string;
+			/** optional group (e.g. ioBroker parent path), rendered as collapsible header */
+			group?: string;
 		}[];
 		onchange?: ((value: string | undefined) => void) | undefined;
 		oniconString?: ((value: string | undefined) => void) | undefined;
@@ -76,8 +78,50 @@
 				)
 			: []
 	);
-	let height = $derived(filter && Math.min(filter.length * itemSize, maxHeight));
-	let itemCount = $derived(filter?.length);
+	// grouping (ioFusion): options with a `group` are shown under collapsible headers
+	type Row =
+		| { kind: 'header'; group: string; count: number; open: boolean }
+		| { kind: 'option'; option: (typeof filter)[number] };
+	let expanded = $state<Record<string, boolean>>({});
+	let grouped = $derived(!!options?.some((option) => option.group));
+	let rows = $derived.by<Row[]>(() => {
+		if (!filter) return [];
+		if (!grouped) return filter.map((option) => ({ kind: 'option', option }));
+		const ungrouped = filter.filter((option) => !option.group);
+		const byGroup = new Map<string, typeof filter>();
+		for (const option of filter) {
+			if (!option.group) continue;
+			if (!byGroup.has(option.group)) byGroup.set(option.group, []);
+			byGroup.get(option.group)!.push(option);
+		}
+		const result: Row[] = ungrouped.map((option) => ({ kind: 'option', option }));
+		const selectedGroup = options?.find((option) => option.id === value)?.group;
+		for (const group of [...byGroup.keys()].sort()) {
+			const items = byGroup.get(group)!;
+			// searching or a single group: everything open, otherwise only chosen groups
+			const open = !!search || byGroup.size === 1 || !!expanded[group] || group === selectedGroup;
+			result.push({ kind: 'header', group, count: items.length, open });
+			if (open) {
+				items.sort((a, b) => a.label.localeCompare(b.label));
+				for (const option of items) result.push({ kind: 'option', option });
+			}
+		}
+		return result;
+	});
+	function toggleGroup(group: string) {
+		const row = rows.find((r) => r.kind === 'header' && r.group === group);
+		expanded[group] = row?.kind === 'header' ? !row.open : true;
+	}
+	function pick(index: number) {
+		const row = rows[index];
+		if (!row) return;
+		if (row.kind === 'header') return toggleGroup(row.group);
+		value = row.option.id;
+		listOpen = false;
+		if (input) input?.blur();
+	}
+	let height = $derived(rows && Math.min(rows.length * itemSize, maxHeight));
+	let itemCount = $derived(rows?.length);
 	let inputProps = $derived({
 		type: 'text',
 		class: 'input',
@@ -95,14 +139,18 @@
 		// down
 		else if (event.key === 'ArrowDown') {
 			event.preventDefault();
-			highlightedIndex = Math.min(highlightedIndex + 1, filter.length - 1);
+			highlightedIndex = Math.min(highlightedIndex + 1, rows.length - 1);
 			scrollToIndex = highlightedIndex;
 		}
 		// enter
 		else if (event.key === 'Enter') {
-			if (highlightedIndex >= 0 && highlightedIndex < filter.length) {
-				value = filter?.[highlightedIndex]?.id;
+			const row = rows[highlightedIndex];
+			if (row?.kind === 'header') {
+				event.preventDefault();
+				toggleGroup(row.group);
+				return;
 			}
+			if (row?.kind === 'option') value = row.option.id;
 			listOpen = false;
 			if (input) input?.blur();
 		}
@@ -121,7 +169,7 @@
 		// lookup index
 		listOpen = true;
 		await tick();
-		const index = filter.findIndex((option: { id: string }) => option.id === value);
+		const index = rows.findIndex((row) => row.kind === 'option' && row.option.id === value);
 		// highlight index, align to 'start'
 		if (index !== -1) {
 			scrollToAlignment = 'start';
@@ -234,35 +282,46 @@
 				onpointerenter={() => {
 					highlightedIndex = index;
 				}}
-				onclick={() => {
-					value = filter?.[index]?.id;
-					listOpen = false;
-					if (input) input?.blur();
-				}}
+				onclick={() => pick(index)}
 			>
-				<div
-					class="item"
-					class:highlighted={index === highlightedIndex}
-					class:selected={value === filter?.[index]?.id}
-				>
-					{#if filter?.[index]?.icon || computeIcons}
-						<div class="item-icon">
-							{#if filter?.[index]?.icon}
-								<Icon icon={String(filter?.[index]?.icon)} height="none" />
-							{:else if computeIcons}
-								<ComputeIcon entity_id={filter?.[index]?.id} />
+				{#if rows[index]?.kind === 'header'}
+					{@const row = rows[index] as Extract<Row, { kind: 'header' }>}
+					<div class="item group" class:highlighted={index === highlightedIndex}>
+						<div class="item-icon chevron-group" class:open={row.open}>
+							<Icon icon="octicon:chevron-right-12" height="none" />
+						</div>
+						<div class="label">
+							<span class="group-path">{row.group.split('.').join(' › ')}</span>
+						</div>
+						<span class="count">{row.count}</span>
+					</div>
+				{:else if rows[index]?.kind === 'option'}
+					{@const option = (rows[index] as Extract<Row, { kind: 'option' }>).option}
+					<div
+						class="item"
+						class:indent={grouped && !!option.group}
+						class:highlighted={index === highlightedIndex}
+						class:selected={value === option.id}
+					>
+						{#if option.icon || computeIcons}
+							<div class="item-icon">
+								{#if option.icon}
+									<Icon icon={String(option.icon)} height="none" />
+								{:else if computeIcons}
+									<ComputeIcon entity_id={option.id} />
+								{/if}
+							</div>
+						{/if}
+						<div class="label">
+							{option.label}
+							{#if option.hint}
+								<span class="name">
+									{option.hint}
+								</span>
 							{/if}
 						</div>
-					{/if}
-					<div class="label">
-						{filter?.[index]?.label}
-						{#if filter?.[index]?.hint}
-							<span class="name">
-								{filter?.[index]?.hint}
-							</span>
-						{/if}
 					</div>
-				</div>
+				{/if}
 			</button>
 		</VirtualList>
 	</div>
@@ -320,6 +379,30 @@
 		gap: 0.9rem;
 		font-size: 0.95rem;
 		height: 100%;
+	}
+	.group {
+		background-color: rgba(255, 255, 255, 0.04);
+		font-weight: 600;
+		padding-right: 1rem;
+	}
+	.group-path {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.chevron-group {
+		transition: transform 150ms ease;
+	}
+	.chevron-group.open {
+		transform: rotate(90deg);
+	}
+	.count {
+		margin-left: auto;
+		font-size: 0.8rem;
+		opacity: 0.5;
+	}
+	.indent {
+		padding-left: 2rem;
 	}
 	.item-icon {
 		display: flex;
