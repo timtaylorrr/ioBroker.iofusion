@@ -63,7 +63,7 @@ export async function load({ request }): Promise<{
 
 	// load theme and locale
 	const [theme, en, locale] = await Promise.all([
-		loadFile(`${dir}/themes/${dashboard.theme || 'godis'}.yaml`),
+		loadFile(`${dir}/themes/${dashboard.theme || 'iofusion'}.yaml`),
 		loadFile(`${dir}/translations/en.json`),
 		configuration?.locale && configuration.locale !== 'en'
 			? loadFile(`${dir}/translations/${configuration.locale}.json`)

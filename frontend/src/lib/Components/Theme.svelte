@@ -23,6 +23,11 @@
 		return result;
 	});
 
+	// lets design.css target a theme, e.g. html[data-theme='iofusion']
+	$effect(() => {
+		if (initial?.title) document.documentElement.dataset.theme = initial.title;
+	});
+
 	/**
 	 * Load theme by name from backend
 	 */

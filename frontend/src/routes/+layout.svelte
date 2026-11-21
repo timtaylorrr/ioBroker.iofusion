@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$lib/design.css';
 	import { motion } from '$lib/Stores';
 	import { fade } from 'svelte/transition';
 	import { Modals, closeModal } from '$lib/Modals';

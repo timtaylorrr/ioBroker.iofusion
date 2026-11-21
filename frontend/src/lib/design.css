@@ -1,0 +1,61 @@
+/*
+ * ioFusion design layer. Only active with the "iofusion" theme
+ * (Theme.svelte sets data-theme on <html>); other themes stay untouched.
+ */
+html[data-theme='iofusion'] {
+	color-scheme: dark;
+	--io-accent: #8b9cff;
+	--io-accent-2: #38bdf8;
+	--io-muted: #8f9bb0;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+html[data-theme='iofusion'] ::selection {
+	background: rgba(139, 156, 255, 0.35);
+}
+
+/* section titles: small, quiet caps instead of big white headings */
+html[data-theme='iofusion'] main header h1 {
+	font-size: 0.8rem;
+	font-weight: 600;
+	letter-spacing: 0.11em;
+	text-transform: uppercase;
+	color: var(--io-muted);
+	margin: 0.35rem 0 0.55rem;
+}
+
+/* view navigation */
+html[data-theme='iofusion'] #navigation {
+	gap: 1.6rem;
+}
+html[data-theme='iofusion'] #navigation button {
+	font-size: 1.02rem;
+	font-weight: 600;
+	letter-spacing: -0.005em;
+	color: rgba(255, 255, 255, 0.55);
+	border-bottom: none !important;
+	transition: color 160ms ease;
+}
+html[data-theme='iofusion'] #navigation button[style*='opacity: 1'],
+html[data-theme='iofusion'] #navigation button:hover {
+	color: #fff;
+}
+html[data-theme='iofusion'] .underline {
+	height: 2px;
+	border-radius: 2px;
+	background: linear-gradient(90deg, var(--io-accent), var(--io-accent-2)) !important;
+	box-shadow: 0 0 12px rgba(139, 156, 255, 0.55);
+}
+
+/* focus ring for keyboard users */
+html[data-theme='iofusion'] :focus-visible {
+	outline: 2px solid var(--io-accent);
+	outline-offset: 2px;
+}
+
+/* thin scrollbars */
+html[data-theme='iofusion'] * {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}

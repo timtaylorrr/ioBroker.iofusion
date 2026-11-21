@@ -836,7 +836,15 @@
 		width: 100%;
 		height: 100%;
 		display: grid;
-		border-radius: 0.65rem;
+		border-radius: var(--theme-tile-radius, 0.65rem);
+		border: var(--theme-tile-border, none);
+		box-shadow: var(--theme-tile-shadow, none);
+		-webkit-backdrop-filter: var(--theme-tile-blur, none);
+		backdrop-filter: var(--theme-tile-blur, none);
+		transition:
+			background-color 220ms ease,
+			box-shadow 220ms ease,
+			border-color 220ms ease;
 		margin: 0;
 		grid-template-columns: min-content auto;
 		grid-auto-flow: row;
@@ -877,7 +885,7 @@
 		height: var(--icon-size);
 		width: var(--icon-size);
 		color: rgb(200 200 200);
-		background-color: rgba(0, 0, 0, 0.25);
+		background-color: var(--theme-icon-background-off, rgba(0, 0, 0, 0.25));
 		border-radius: 50%;
 		display: grid;
 		align-items: center;
@@ -934,7 +942,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		border-radius: 0.65rem;
+		border-radius: var(--theme-tile-radius, 0.65rem);
 		overflow: hidden;
 		z-index: 10;
 		pointer-events: none;
@@ -985,6 +993,8 @@
 
 	.container[data-state='true'] {
 		background-color: var(--theme-button-background-color-on);
+		border: var(--theme-tile-border-on, var(--theme-tile-border, none));
+		box-shadow: var(--theme-tile-shadow-on, var(--theme-tile-shadow, none));
 		color: black;
 	}
 

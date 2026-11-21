@@ -23,7 +23,7 @@
 
 	onMount(async () => {
 		// something needs to be selected, set default
-		if (!$dashboard.theme) setTheme('godis');
+		if (!$dashboard.theme) setTheme('iofusion');
 
 		// load themes if not prop has already loaded
 		if (!themes) {

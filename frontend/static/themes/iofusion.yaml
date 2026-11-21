@@ -1,0 +1,40 @@
+title: iofusion
+author: ioFusion
+attribution: ''
+theme:
+  colors-text: rgb(226, 232, 242)
+  colors-icon: rgb(226, 232, 242)
+  colors-title: rgb(247, 249, 252)
+  colors-background: '#090c13'
+  colors-sidebar-border: 1px solid rgba(255, 255, 255, 0.07)
+  colors-sidebar-background: rgba(255, 255, 255, 0.025)
+  sizes-sidebar-time: 3.4rem
+  background-image: "radial-gradient(1100px 640px at 8% -8%, rgba(99, 102, 241, 0.30), transparent 62%), radial-gradient(900px 560px at 104% 4%, rgba(14, 165, 233, 0.24), transparent 58%), radial-gradient(800px 600px at 50% 112%, rgba(168, 85, 247, 0.20), transparent 60%), linear-gradient(180deg, #0c1019 0%, #080b11 100%)"
+  font-family: "'Inter Variable', system-ui"
+  button-background-color-on: rgba(255, 255, 255, 0.95)
+  button-background-color-off: rgba(255, 255, 255, 0.055)
+  drawer-button-background-color: rgba(255, 255, 255, 0.07)
+  button-name-color-on: '#0b1020'
+  button-name-color-off: '#e6eaf2'
+  button-state-color-on: '#56627a'
+  button-state-color-off: '#8793a8'
+  display-only-background-color: rgba(255, 255, 255, 0.03)
+  display-only-name-color: rgb(226, 232, 242)
+  display-only-state-color: rgb(135, 147, 168)
+  modal-background-color: rgba(8, 11, 17, 0.6)
+  modal-background-color-modal: rgba(17, 22, 33, 0.82)
+  border-radius: 0.9rem
+  sidebar-font-size: 1rem
+  sidebar-item-padding: 0.6rem 0.6rem
+  sidebar-padding: 0 1.4rem
+  drawer-font-size: 0.925rem
+  sidebar-divider: 1px solid rgba(255, 255, 255, 0.07)
+  navigate-background-color: rgba(255, 255, 255, 0.08)
+  app-color: '#090c13'
+  tile-radius: 1.1rem
+  tile-border: 1px solid rgba(255, 255, 255, 0.075)
+  tile-border-on: 1px solid rgba(255, 255, 255, 0.9)
+  tile-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05)
+  tile-shadow-on: 0 14px 34px -12px rgba(120, 140, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25)
+  tile-blur: blur(18px) saturate(140%)
+  icon-background-off: rgba(255, 255, 255, 0.07)
