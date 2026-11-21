@@ -78,44 +78,69 @@
 				)
 			: []
 	);
-	// grouping (ioFusion): options with a `group` are shown under collapsible headers
+	// grouping (ioFusion): options with a `group` (ioBroker parent path) are shown as a
+	// collapsible tree, one level per path segment, like the ioBroker object view
+	type Opt = (typeof filter)[number];
 	type Row =
-		| { kind: 'header'; group: string; count: number; open: boolean }
-		| { kind: 'option'; option: (typeof filter)[number] };
+		| { kind: 'header'; path: string; name: string; depth: number; count: number; open: boolean }
+		| { kind: 'option'; option: Opt; depth: number };
+	type TreeNode = { children: Map<string, TreeNode>; options: Opt[]; count: number };
 	let expanded = $state<Record<string, boolean>>({});
 	let grouped = $derived(!!options?.some((option) => option.group));
 	let rows = $derived.by<Row[]>(() => {
 		if (!filter) return [];
-		if (!grouped) return filter.map((option) => ({ kind: 'option', option }));
-		const ungrouped = filter.filter((option) => !option.group);
-		const byGroup = new Map<string, typeof filter>();
+		if (!grouped) return filter.map((option) => ({ kind: 'option', option, depth: 0 }));
+
+		// build the tree
+		const root: TreeNode = { children: new Map(), options: [], count: 0 };
 		for (const option of filter) {
-			if (!option.group) continue;
-			if (!byGroup.has(option.group)) byGroup.set(option.group, []);
-			byGroup.get(option.group)!.push(option);
-		}
-		const result: Row[] = ungrouped.map((option) => ({ kind: 'option', option }));
-		const selectedGroup = options?.find((option) => option.id === value)?.group;
-		for (const group of [...byGroup.keys()].sort()) {
-			const items = byGroup.get(group)!;
-			// searching or a single group: everything open, otherwise only chosen groups
-			const open = !!search || byGroup.size === 1 || !!expanded[group] || group === selectedGroup;
-			result.push({ kind: 'header', group, count: items.length, open });
-			if (open) {
-				items.sort((a, b) => a.label.localeCompare(b.label));
-				for (const option of items) result.push({ kind: 'option', option });
+			if (!option.group) {
+				root.options.push(option);
+				continue;
 			}
+			let node = root;
+			// adapter and instance form one level, like `hm-rpc.0` in ioBroker
+			const parts = option.group.split('.');
+			if (parts.length > 1 && /^\d+$/.test(parts[1])) parts.splice(0, 2, `${parts[0]}.${parts[1]}`);
+			for (const segment of parts) {
+				if (!node.children.has(segment)) {
+					node.children.set(segment, { children: new Map(), options: [], count: 0 });
+				}
+				node = node.children.get(segment)!;
+				node.count++;
+			}
+			node.options.push(option);
 		}
+
+		// nodes on the way to the selected value stay open
+		const selectedGroup = options?.find((option) => option.id === value)?.group ?? '';
+		const result: Row[] = [];
+		const emit = (node: TreeNode, prefix: string, depth: number) => {
+			node.options.sort((a, b) => a.label.localeCompare(b.label));
+			for (const option of node.options) result.push({ kind: 'option', option, depth });
+			for (const name of [...node.children.keys()].sort((a, b) => a.localeCompare(b))) {
+				const child = node.children.get(name)!;
+				const path = prefix ? `${prefix}.${name}` : name;
+				const open =
+					!!search ||
+					!!expanded[path] ||
+					selectedGroup === path ||
+					selectedGroup.startsWith(`${path}.`);
+				result.push({ kind: 'header', path, name, depth, count: child.count, open });
+				if (open) emit(child, path, depth + 1);
+			}
+		};
+		emit(root, '', 0);
 		return result;
 	});
-	function toggleGroup(group: string) {
-		const row = rows.find((r) => r.kind === 'header' && r.group === group);
-		expanded[group] = row?.kind === 'header' ? !row.open : true;
+	function toggleGroup(path: string) {
+		const row = rows.find((r) => r.kind === 'header' && r.path === path);
+		expanded[path] = row?.kind === 'header' ? !row.open : true;
 	}
 	function pick(index: number) {
 		const row = rows[index];
 		if (!row) return;
-		if (row.kind === 'header') return toggleGroup(row.group);
+		if (row.kind === 'header') return toggleGroup(row.path);
 		value = row.option.id;
 		listOpen = false;
 		if (input) input?.blur();
@@ -147,7 +172,7 @@
 			const row = rows[highlightedIndex];
 			if (row?.kind === 'header') {
 				event.preventDefault();
-				toggleGroup(row.group);
+				toggleGroup(row.path);
 				return;
 			}
 			if (row?.kind === 'option') value = row.option.id;
@@ -286,12 +311,17 @@
 			>
 				{#if rows[index]?.kind === 'header'}
 					{@const row = rows[index] as Extract<Row, { kind: 'header' }>}
-					<div class="item group" class:highlighted={index === highlightedIndex}>
+					<div
+						class="item group"
+						class:highlighted={index === highlightedIndex}
+						style:padding-left="{0.8 + row.depth * 1.1}rem"
+						title={row.path}
+					>
 						<div class="item-icon chevron-group" class:open={row.open}>
 							<Icon icon="octicon:chevron-right-12" height="none" />
 						</div>
 						<div class="label">
-							<span class="group-path">{row.group.split('.').join(' › ')}</span>
+							<span class="group-path">{row.name}</span>
 						</div>
 						<span class="count">{row.count}</span>
 					</div>
@@ -299,7 +329,7 @@
 					{@const option = (rows[index] as Extract<Row, { kind: 'option' }>).option}
 					<div
 						class="item"
-						class:indent={grouped && !!option.group}
+						style:padding-left={grouped ? `${1 + (rows[index] as Extract<Row, { kind: 'option' }>).depth * 1.1 + (option.group ? 0.6 : 0)}rem` : undefined}
 						class:highlighted={index === highlightedIndex}
 						class:selected={value === option.id}
 					>
@@ -400,9 +430,6 @@
 		margin-left: auto;
 		font-size: 0.8rem;
 		opacity: 0.5;
-	}
-	.indent {
-		padding-left: 2rem;
 	}
 	.item-icon {
 		display: flex;
