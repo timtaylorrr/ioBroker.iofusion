@@ -9,6 +9,7 @@ const { ensureDataDir } = require('./lib/data');
 const { nameOf } = require('./lib/entities');
 const { buildDashboard, hasViews, writeDashboard } = require('./lib/dashboard');
 const { createAuth } = require('./lib/auth');
+const { pickGraphEntities } = require('./lib/history');
 
 /** Turn `a.*, b.c.*` into a matcher over ioBroker ids */
 function makeFilter(patterns) {
@@ -34,13 +35,43 @@ class IoFusion extends utils.Adapter {
 		this.on('unload', this.onUnload.bind(this));
 	}
 
+	/** Ask a history adapter (history, influxdb, sql) for recorded values. */
+	queryHistory(instance, id, { start, end, step, aggregate }) {
+		return new Promise((resolve) => {
+			if (!instance) return resolve([]);
+			const timer = setTimeout(() => resolve([]), 20000);
+			this.sendTo(
+				instance,
+				'getHistory',
+				{
+					id,
+					options: {
+						start,
+						end,
+						aggregate,
+						...(step ? { step } : {}),
+						count: 2000,
+						ignoreNull: true,
+						addId: false
+					}
+				},
+				(reply) => {
+					clearTimeout(timer);
+					if (reply?.error) this.log.debug(`ioFusion: history for ${id}: ${reply.error}`);
+					resolve(Array.isArray(reply?.result) ? reply.result : []);
+				}
+			);
+		});
+	}
+
 	/** Rebuild dashboard.yaml from the ioBroker rooms (enum.rooms). */
 	async generateDashboard() {
 		const rooms = await this.iob.rooms();
 		const dashboard = buildDashboard({
 			registry: this.bridge.registry,
 			rooms,
-			lang: this.language
+			lang: this.language,
+			graphEntityIds: pickGraphEntities(this.bridge.registry, this.iob.historyInstance)
 		});
 		const backup = writeDashboard(this.dataDir, dashboard);
 		this.log.info(`ioFusion: dashboard generated (${dashboard.views.length} views${backup ? `, backup ${backup}` : ''})`);
@@ -65,7 +96,7 @@ class IoFusion extends utils.Adapter {
 
 	async onReady() {
 		this.setState('info.connection', false, true);
-		const { port, bind, include, invertCover, authEnabled, username, password } = this.config;
+		const { port, bind, include, invertCover, authEnabled, username, password, historyInstance } = this.config;
 		const matches = makeFilter(include);
 		const own = `${this.namespace}.`;
 
@@ -89,6 +120,8 @@ class IoFusion extends utils.Adapter {
 					members: row.value?.common?.members || []
 				}));
 			},
+			historyInstance: String(historyInstance || '').trim(),
+			history: (id, options) => this.queryHistory(String(historyInstance).trim(), id, options),
 			setState: async (id, val) => {
 				await this.setForeignStateAsync(id, { val, ack: false });
 			},

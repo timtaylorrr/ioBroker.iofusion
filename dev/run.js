@@ -10,6 +10,7 @@ const { startServer } = require('../lib/server');
 const { ensureDataDir } = require('../lib/data');
 const { buildDashboard, hasViews, writeDashboard } = require('../lib/dashboard');
 const { createAuth } = require('../lib/auth');
+const { pickGraphEntities } = require('../lib/history');
 
 const obj = (name, role, type, extra = {}) => ({
 	type: 'state',
@@ -46,6 +47,10 @@ Object.assign(objects, {
 	'hm-rpc.0.BLIND1.1.STOP': obj('Wohnzimmer Rollladen Stopp', 'button.stop', 'boolean'),
 	'hm-rpc.0.BLIND2.1.LEVEL': obj('Schlafzimmer Rollladen', 'level.blind', 'number', { min: 0, max: 100, unit: '%' })
 });
+// history is enabled for these states in the fake history.0 instance
+for (const id of ['0_userdata.0.wohnzimmer.temperatur', '0_userdata.0.wohnzimmer.feuchte', 'hm-rpc.0.NEQ2002.1.TEMPERATURE', 'zigbee.0.00158d0002.temperature', 'shelly.0.shellyplug#AB12.Relay0.Power']) {
+	objects[id].common.custom = { 'history.0': { enabled: true } };
+}
 const values = {
 	'0_userdata.0.wohnzimmer.licht': true,
 	'0_userdata.0.wohnzimmer.dimmer': 40,
@@ -87,7 +92,21 @@ const rooms = [
 	{ id: 'enum.rooms.garten', name: 'Garten', members: ['zigbee.0.00158d0002'] }
 ];
 
+// synthetic recordings: a daily sine wave around the current value
+const fakeHistory = async (id, { start, end, step, aggregate }) => {
+	const base = Number(values[id]) || 20;
+	const rows = [];
+	if (aggregate === 'onchange') return rows;
+	for (let ts = Math.ceil(start / step) * step; ts < end; ts += step) {
+		const day = (ts % 86400000) / 86400000;
+		rows.push({ ts, val: base + Math.sin(day * 2 * Math.PI - 1.6) * (base * 0.12) + Math.sin(ts / 3.7e6) * (base * 0.02) });
+	}
+	return rows;
+};
+
 const iob = {
+	historyInstance: 'history.0',
+	history: fakeHistory,
 	list: async () => Object.entries(objects).map(([id, o]) => ({ id, obj: o, state: stateOf(values[id]) })),
 	setState: async (id, val) => {
 		console.log('[mock] setState', id, val);
@@ -102,7 +121,7 @@ const iob = {
 	await bridge.init();
 	const dataDir = path.join(__dirname, '.data');
 	ensureDataDir(dataDir);
-	if (!hasViews(dataDir)) writeDashboard(dataDir, buildDashboard({ registry: bridge.registry, rooms, lang: 'de' }));
+	if (!hasViews(dataDir)) writeDashboard(dataDir, buildDashboard({ registry: bridge.registry, rooms, lang: 'de', graphEntityIds: pickGraphEntities(bridge.registry, 'history.0') }));
 	// DEV_AUTH=user:password turns the login on
 	const [user, pass] = String(process.env.DEV_AUTH || '').split(':');
 	const auth = createAuth({ enabled: !!process.env.DEV_AUTH, username: user, password: pass, dataDir, lang: 'de' });

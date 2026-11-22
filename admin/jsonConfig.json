@@ -15,6 +15,13 @@
 			"label": "Bind address",
 			"sm": 6
 		},
+		"historyInstance": {
+			"type": "text",
+			"label": "History instance for graphs",
+			"help": "Instance of a history adapter, e.g. history.0, influxdb.0 or sql.0. States need history enabled there. Empty = no graphs.",
+			"sm": 6,
+			"newLine": true
+		},
 		"authEnabled": {
 			"type": "checkbox",
 			"label": "Require login",

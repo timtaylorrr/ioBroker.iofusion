@@ -33,6 +33,7 @@
 		"include": "*",
 		"invertCover": false,
 		"authEnabled": false,
+		"historyInstance": "",
 		"username": "",
 		"password": ""
 	},
