@@ -1,13 +1,12 @@
 'use strict';
 
-const crypto = require('node:crypto');
 const path = require('node:path');
 const utils = require('@iobroker/adapter-core');
 const { Bridge } = require('./lib/bridge');
 const { startServer } = require('./lib/server');
-const { ensureDataDir } = require('./lib/data');
+const { ensureDataDir, loadToken } = require('./lib/data');
 const { nameOf } = require('./lib/entities');
-const { buildDashboard, hasViews, writeDashboard } = require('./lib/dashboard');
+const { buildDashboard, hasViews, writeDashboard, migrateTheme } = require('./lib/dashboard');
 const { createAuth } = require('./lib/auth');
 const { pickGraphEntities } = require('./lib/history');
 
@@ -148,7 +147,9 @@ class IoFusion extends utils.Adapter {
 			onStateChange: (cb) => this.stateCallbacks.push(cb)
 		});
 
-		const token = crypto.randomBytes(24).toString('hex');
+		const dataDir = (this.dataDir = path.join(utils.getAbsoluteInstanceDataDir(this), 'data'));
+		ensureDataDir(dataDir);
+		const token = loadToken(dataDir);
 		this.bridge = new Bridge(iob, {
 			token,
 			invertCover,
@@ -159,8 +160,6 @@ class IoFusion extends utils.Adapter {
 		await this.subscribeForeignStatesAsync('*');
 		await this.subscribeForeignObjectsAsync('*');
 
-		const dataDir = (this.dataDir = path.join(utils.getAbsoluteInstanceDataDir(this), 'data'));
-		ensureDataDir(dataDir);
 		// first start: build a dashboard from the rooms so the page is not empty
 		if (!hasViews(dataDir)) {
 			try {
@@ -168,6 +167,12 @@ class IoFusion extends utils.Adapter {
 			} catch (error) {
 				this.log.warn(`ioFusion: could not generate dashboard: ${error?.message || error}`);
 			}
+		}
+
+		try {
+			if (migrateTheme(dataDir)) this.log.info('ioFusion: the old default theme "godis" was replaced by "iofusion" (one time, backup saved)');
+		} catch (error) {
+			this.log.warn(`ioFusion: theme migration failed: ${error?.message || error}`);
 		}
 
 		let auth;
