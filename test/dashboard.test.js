@@ -43,6 +43,12 @@ test('dashboard has a view per non-empty room, groups by type and shortens names
 	assert.strictEqual(new Set(ids).size, ids.length);
 });
 
+test('sidebar has clock, date, notifications and the requested graphs', () => {
+	const dashboard = buildDashboard({ registry: buildRegistry(list), rooms, graphEntityIds: ['sensor.x'] });
+	assert.deepStrictEqual(dashboard.sidebar.map((i) => i.type), ['time', 'date', 'notifications', 'graph']);
+	assert.strictEqual(dashboard.hide_sidebar, false);
+});
+
 test('unassigned entities get no view when there are too many', () => {
 	const dashboard = buildDashboard({ registry: buildRegistry(list), rooms, lang: 'en', maxUnassigned: 0 });
 	assert.ok(!dashboard.views.some((v) => v.name === 'Other'));
@@ -52,4 +58,17 @@ test('shortName only strips a real room prefix', () => {
 	assert.strictEqual(shortName('Küche Licht', 'Küche'), 'Licht');
 	assert.strictEqual(shortName('Küche', 'Küche'), undefined);
 	assert.strictEqual(shortName('Bad', 'Küche'), undefined);
+});
+
+test('grouping by function uses enum.functions and falls back to the device type', () => {
+	const functions = [
+		{ id: 'enum.functions.licht', name: 'Beleuchtung', members: ['hm.0.L1'] },
+		{ id: 'enum.functions.leer', name: 'Leer', members: [] }
+	];
+	const dashboard = buildDashboard({ registry: buildRegistry(list), rooms, functions, groupBy: 'function', lang: 'de' });
+	const wz = dashboard.views[0];
+	assert.deepStrictEqual(wz.sections.map((g) => g.name), ['Beleuchtung', 'Sensoren']);
+	assert.strictEqual(wz.sections[0].items[0].entity_id, 'light.hm_0_l1_1_state');
+	// default stays grouped by type
+	assert.deepStrictEqual(buildDashboard({ registry: buildRegistry(list), rooms, lang: 'de' }).views[0].sections.map((g) => g.name), ['Licht & Schalter', 'Sensoren']);
 });

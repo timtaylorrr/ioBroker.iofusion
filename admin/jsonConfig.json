@@ -49,6 +49,16 @@
 			"sm": 12,
 			"newLine": true
 		},
+		"groupBy": {
+			"type": "select",
+			"label": "Group the generated dashboard by",
+			"options": [
+				{ "label": "Device type (lights, blinds, climate ...)", "value": "type" },
+				{ "label": "Function (enum.functions)", "value": "function" }
+			],
+			"sm": 6,
+			"newLine": true
+		},
 		"generateDashboard": {
 			"type": "sendTo",
 			"command": "generateDashboard",

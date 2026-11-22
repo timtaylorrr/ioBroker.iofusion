@@ -34,6 +34,7 @@
 		"invertCover": false,
 		"authEnabled": false,
 		"historyInstance": "",
+		"groupBy": "type",
 		"username": "",
 		"password": ""
 	},

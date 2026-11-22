@@ -159,6 +159,9 @@ const iob = {
 	const auth = createAuth({ enabled: !!process.env.DEV_AUTH, username: user, password: pass, dataDir, lang: 'de' });
 	await startServer({ auth, port: Number(process.env.PORT) || 8095, bind: '127.0.0.1', dataDir, token, bridge });
 
+	// simulate a battery that runs low after a while
+	setTimeout(() => emit('zigbee.0.00158d0002.battery', 12), 12000);
+
 	// simulate a live sensor
 	setInterval(() => {
 		emit('0_userdata.0.wohnzimmer.temperatur', Math.round((20 + Math.random() * 3) * 10) / 10);

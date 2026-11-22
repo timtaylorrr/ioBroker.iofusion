@@ -35,6 +35,19 @@ class IoFusion extends utils.Adapter {
 		this.on('unload', this.onUnload.bind(this));
 	}
 
+	/** enum.rooms / enum.functions as [{id, name, members}] */
+	async readEnum(kind) {
+		const view = await this.getObjectViewAsync('system', 'enum', {
+			startkey: `enum.${kind}.`,
+			endkey: `enum.${kind}.\u9999`
+		});
+		return (view?.rows || []).map((row) => ({
+			id: row.id,
+			name: nameOf(row.value, row.id.replace(`enum.${kind}.`, '')),
+			members: row.value?.common?.members || []
+		}));
+	}
+
 	/** Ask a history adapter (history, influxdb, sql) for recorded values. */
 	queryHistory(instance, id, { start, end, step, aggregate }) {
 		return new Promise((resolve) => {
@@ -67,9 +80,12 @@ class IoFusion extends utils.Adapter {
 	/** Rebuild dashboard.yaml from the ioBroker rooms (enum.rooms). */
 	async generateDashboard() {
 		const rooms = await this.iob.rooms();
+		const groupBy = this.config.groupBy === 'function' ? 'function' : 'type';
 		const dashboard = buildDashboard({
 			registry: this.bridge.registry,
 			rooms,
+			groupBy,
+			functions: groupBy === 'function' ? await this.iob.functions() : [],
 			lang: this.language,
 			graphEntityIds: pickGraphEntities(this.bridge.registry, this.iob.historyInstance)
 		});
@@ -109,17 +125,8 @@ class IoFusion extends utils.Adapter {
 				const states = await this.getForeignStatesAsync('*');
 				return objects.map((o) => ({ ...o, state: states?.[o.id] ?? null }));
 			},
-			rooms: async () => {
-				const view = await this.getObjectViewAsync('system', 'enum', {
-					startkey: 'enum.rooms.',
-					endkey: 'enum.rooms.\u9999'
-				});
-				return (view?.rows || []).map((row) => ({
-					id: row.id,
-					name: nameOf(row.value, row.id.replace('enum.rooms.', '')),
-					members: row.value?.common?.members || []
-				}));
-			},
+			rooms: () => this.readEnum('rooms'),
+			functions: () => this.readEnum('functions'),
 			historyInstance: String(historyInstance || '').trim(),
 			history: (id, options) => this.queryHistory(String(historyInstance).trim(), id, options),
 			setState: async (id, val) => {
