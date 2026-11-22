@@ -1,6 +1,6 @@
 {
 	"name": "iobroker.iofusion",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Drag-and-drop dashboard for ioBroker, based on ha-fusion",
 	"license": "MIT",
 	"main": "main.js",
@@ -31,5 +31,14 @@
 		"@iobroker/adapter-core": "^3.2.3",
 		"js-yaml": "^4.3.2",
 		"ws": "^8.18.0"
-	}
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/timtaylorrr/ioBroker.iofusion.git"
+	},
+	"bugs": {
+		"url": "https://github.com/timtaylorrr/ioBroker.iofusion/issues"
+	},
+	"homepage": "https://github.com/timtaylorrr/ioBroker.iofusion#readme",
+	"author": "ioFusion contributors"
 }

@@ -1,0 +1,22 @@
+{
+	"Port": "Port",
+	"Bind address": "Bind-Adresse",
+	"Exposed state IDs (comma separated, * as wildcard)": "Freigegebene State-IDs (Komma-getrennt, * als Platzhalter)",
+	"History instance for graphs": "History-Instanz für Graphen",
+	"Instance of a history adapter, e.g. history.0, influxdb.0 or sql.0. States need history enabled there. Empty = no graphs.": "Instanz eines History-Adapters, z. B. history.0, influxdb.0 oder sql.0. Die States brauchen dort aktivierten Verlauf. Leer = keine Graphen.",
+	"Require login": "Anmeldung verlangen",
+	"Strongly recommended. Without it everybody who can reach the port can control your devices.": "Dringend empfohlen. Ohne Anmeldung kann jeder, der den Port erreicht, deine Geräte steuern.",
+	"Username": "Benutzername",
+	"Password": "Passwort",
+	"Group the generated dashboard by": "Erzeugtes Dashboard gruppieren nach",
+	"Device type (lights, blinds, climate ...)": "Gerätetyp (Licht, Rollläden, Klima ...)",
+	"Function (enum.functions)": "Funktion (enum.functions)",
+	"Generate dashboard from rooms": "Dashboard aus Räumen erzeugen",
+	"Creates one view per ioBroker room (enum.rooms). A dashboard that already exists is kept as a backup file in the data directory.": "Erzeugt pro ioBroker-Raum (enum.rooms) eine Ansicht. Ein vorhandenes Dashboard bleibt als Sicherungsdatei im Datenverzeichnis erhalten.",
+	"Replace the current dashboard with one generated from your rooms?": "Das aktuelle Dashboard durch ein aus deinen Räumen erzeugtes ersetzen?",
+	"Generate": "Erzeugen",
+	"Cancel": "Abbrechen",
+	"Invert blind position (0 = open, 100 = closed)": "Rollladenposition umkehren (0 = offen, 100 = geschlossen)",
+	"Home Assistant counts 100 as open. Enable this if your blinds use 100 for closed.": "Home Assistant zählt 100 als offen. Aktiviere das, wenn deine Rollläden 100 für geschlossen nutzen.",
+	"Example: hm-rpc.*, zigbee.0.*, 0_userdata.0.*": "Beispiel: hm-rpc.*, zigbee.*, 0_userdata.0.*"
+}

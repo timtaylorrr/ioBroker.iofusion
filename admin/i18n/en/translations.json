@@ -1,0 +1,22 @@
+{
+	"Port": "Port",
+	"Bind address": "Bind address",
+	"Exposed state IDs (comma separated, * as wildcard)": "Exposed state IDs (comma separated, * as wildcard)",
+	"History instance for graphs": "History instance for graphs",
+	"Instance of a history adapter, e.g. history.0, influxdb.0 or sql.0. States need history enabled there. Empty = no graphs.": "Instance of a history adapter, e.g. history.0, influxdb.0 or sql.0. States need history enabled there. Empty = no graphs.",
+	"Require login": "Require login",
+	"Strongly recommended. Without it everybody who can reach the port can control your devices.": "Strongly recommended. Without it everybody who can reach the port can control your devices.",
+	"Username": "Username",
+	"Password": "Password",
+	"Group the generated dashboard by": "Group the generated dashboard by",
+	"Device type (lights, blinds, climate ...)": "Device type (lights, blinds, climate ...)",
+	"Function (enum.functions)": "Function (enum.functions)",
+	"Generate dashboard from rooms": "Generate dashboard from rooms",
+	"Creates one view per ioBroker room (enum.rooms). A dashboard that already exists is kept as a backup file in the data directory.": "Creates one view per ioBroker room (enum.rooms). A dashboard that already exists is kept as a backup file in the data directory.",
+	"Replace the current dashboard with one generated from your rooms?": "Replace the current dashboard with one generated from your rooms?",
+	"Generate": "Generate",
+	"Cancel": "Cancel",
+	"Invert blind position (0 = open, 100 = closed)": "Invert blind position (0 = open, 100 = closed)",
+	"Home Assistant counts 100 as open. Enable this if your blinds use 100 for closed.": "Home Assistant counts 100 as open. Enable this if your blinds use 100 for closed.",
+	"Example: hm-rpc.*, zigbee.0.*, 0_userdata.0.*": "Example: hm-rpc.*, zigbee.0.*, 0_userdata.0.*"
+}

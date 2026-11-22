@@ -21,7 +21,7 @@ Home Assistant style entities, so the frontend runs unchanged.
 Blind position: 100 is open. If your blinds use 100 for closed, enable "Invert blind position" in the instance settings.
 Thermostats expose one mode (`heat`) and a target temperature; modes, presets and schedules are not mapped yet.
 
-Not supported yet: functions (`enum.functions`), media players, history/statistics graphs, areas (enum.rooms), todo, updates.
+Not supported yet: locks, fans, vacuum cleaners, cameras, alarm panels, todo lists, update entities, thermostat modes and schedules, blind tilt.
 
 ## Rooms and automatic dashboard
 On the first start (while no dashboard exists) the adapter builds one from your ioBroker rooms (`enum.rooms`):
@@ -32,7 +32,7 @@ The button "Generate dashboard from rooms" in the instance settings rebuilds it;
 `dashboard.yaml.bak-<time>` in the data directory.
 
 ## Settings
-Port (default 8095), bind address and a filter for the exposed state IDs (`hm-rpc.*, 0_userdata.0.*`).
+Port (default 8095), bind address, a filter for the exposed state IDs (`hm-rpc.*, 0_userdata.0.*`), the history instance for graphs (`history.0`, `influxdb.0`, `sql.0`), login, blind inversion and how the generated dashboard is grouped.
 Dashboard and settings are stored in the instance data directory, so they are part of the ioBroker backup.
 
 ## Login
@@ -54,3 +54,17 @@ npm run dev              # fake ioBroker on http://127.0.0.1:8095 (DEV_AUTH=user
 npm test
 ```
 `frontend/` is a copy of ha-fusion with small changes (configurable data dir, own-origin connection).
+
+## Changelog
+
+### 0.2.0
+- Rooms and automatic dashboard (`enum.rooms`, optional grouping by `enum.functions`)
+- Login with cookie sessions
+- Climate, blinds, media players, colour lights, indicator sensors
+- History graphs through a history adapter (history, influxdb, sql)
+- Notifications for low batteries and unreachable devices
+- Live updates when states are added or removed
+- New "iofusion" dark and light themes, logout button, admin translations (en, de)
+
+### 0.1.0
+- Initial version: ha-fusion frontend with a Home Assistant compatible bridge for ioBroker

@@ -1,20 +1,39 @@
 {
 	"common": {
 		"name": "iofusion",
-		"version": "0.1.0",
+		"version": "0.2.0",
 		"news": {
-			"0.1.0": { "en": "Initial version", "de": "Erste Version" }
+			"0.2.0": {
+				"en": "Rooms and automatic dashboard, login, climate, blinds, media players, colour lights, history graphs, notifications, light theme",
+				"de": "Räume und automatisches Dashboard, Login, Klima, Rollläden, Medienwiedergabe, Farblicht, Verlaufsgraphen, Benachrichtigungen, helles Theme"
+			},
+			"0.1.0": {
+				"en": "Initial version",
+				"de": "Erste Version"
+			}
 		},
 		"title": "ioFusion",
-		"titleLang": { "en": "ioFusion", "de": "ioFusion" },
+		"titleLang": {
+			"en": "ioFusion",
+			"de": "ioFusion"
+		},
 		"desc": {
 			"en": "Modern drag-and-drop dashboard for ioBroker, based on ha-fusion",
 			"de": "Modernes Drag-and-drop-Dashboard für ioBroker, basierend auf ha-fusion"
 		},
-		"authors": ["ioFusion contributors"],
-		"keywords": ["dashboard", "visualization", "ha-fusion"],
+		"authors": [
+			"ioFusion contributors"
+		],
+		"keywords": [
+			"dashboard",
+			"visualization",
+			"ha-fusion"
+		],
 		"license": "MIT",
-		"licenseInformation": { "license": "MIT", "type": "free" },
+		"licenseInformation": {
+			"license": "MIT",
+			"type": "free"
+		},
 		"platform": "Javascript/Node.js",
 		"mode": "daemon",
 		"messagebox": true,
@@ -22,10 +41,26 @@
 		"compact": false,
 		"connectionType": "local",
 		"dataSource": "push",
-		"adminUI": { "config": "json" },
+		"adminUI": {
+			"config": "json"
+		},
 		"tier": 3,
-		"dependencies": [{ "js-controller": ">=5.0.19" }],
-		"globalDependencies": [{ "admin": ">=6.17.14" }]
+		"dependencies": [
+			{
+				"js-controller": ">=5.0.19"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": ">=6.17.14"
+			}
+		],
+		"icon": "iofusion.svg",
+		"extIcon": "https://raw.githubusercontent.com/timtaylorrr/ioBroker.iofusion/main/admin/iofusion.svg",
+		"readme": "https://github.com/timtaylorrr/ioBroker.iofusion/blob/main/README.md",
+		"enabled": true,
+		"loglevel": "info",
+		"restartAdapters": []
 	},
 	"native": {
 		"port": 8095,
@@ -38,14 +73,20 @@
 		"username": "",
 		"password": ""
 	},
-	"encryptedNative": ["password"],
-	"protectedNative": ["password"],
+	"encryptedNative": [
+		"password"
+	],
+	"protectedNative": [
+		"password"
+	],
 	"objects": [],
 	"instanceObjects": [
 		{
 			"_id": "info",
 			"type": "channel",
-			"common": { "name": "Information" },
+			"common": {
+				"name": "Information"
+			},
 			"native": {}
 		},
 		{
