@@ -54,6 +54,7 @@ export async function load({ request }): Promise<{
 
 	// ioFusion adapter: access token for the built-in bridge
 	if (process.env.IOFUSION_TOKEN) configuration.token = process.env.IOFUSION_TOKEN;
+	if (process.env.IOFUSION_AUTH === '1') configuration.iofusionAuth = true;
 
 	// initialize keys if missing
 	dashboard.views = dashboard.views || [];

@@ -100,6 +100,11 @@
 				{#await import('$lib/Drawer/SettingsButton.svelte') then SettingsButton}
 					<SettingsButton.default {data} />
 				{/await}
+				{#if data?.configuration?.iofusionAuth}
+					{#await import('$lib/Drawer/LogoutButton.svelte') then LogoutButton}
+						<LogoutButton.default />
+					{/await}
+				{/if}
 			</div>
 
 			<!-- {#if chrome}
@@ -153,6 +158,8 @@
 
 	.settings {
 		grid-area: settings;
+		display: flex;
+		gap: 0.5rem;
 	}
 
 	.push {

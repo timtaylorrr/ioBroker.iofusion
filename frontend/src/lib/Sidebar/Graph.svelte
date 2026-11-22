@@ -246,7 +246,7 @@
 
 	.line {
 		fill: none;
-		stroke: #ffffff;
+		stroke: var(--theme-graph-stroke, #ffffff);
 		stroke-linecap: butt;
 	}
 </style>

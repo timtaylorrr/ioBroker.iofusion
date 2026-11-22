@@ -2,21 +2,32 @@
  * ioFusion design layer. Only active with the "iofusion" theme
  * (Theme.svelte sets data-theme on <html>); other themes stay untouched.
  */
-html[data-theme='iofusion'] {
+html[data-theme^='iofusion'] {
 	color-scheme: dark;
 	--io-accent: #8b9cff;
 	--io-accent-2: #38bdf8;
 	--io-muted: #8f9bb0;
+	--io-nav: rgba(255, 255, 255, 0.55);
+	--io-nav-active: #fff;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
-html[data-theme='iofusion'] ::selection {
-	background: rgba(139, 156, 255, 0.35);
+html[data-theme^='iofusion'] ::selection {
+	background: color-mix(in srgb, var(--io-accent) 35%, transparent);
+}
+
+html[data-theme='iofusion-light'] {
+	color-scheme: light;
+	--io-accent: #5b6cf0;
+	--io-accent-2: #0ea5e9;
+	--io-muted: #64748b;
+	--io-nav: rgba(15, 23, 42, 0.5);
+	--io-nav-active: #0f172a;
 }
 
 /* section titles: small, quiet caps instead of big white headings */
-html[data-theme='iofusion'] main header h1 {
+html[data-theme^='iofusion'] main header h1 {
 	font-size: 0.8rem;
 	font-weight: 600;
 	letter-spacing: 0.11em;
@@ -26,36 +37,44 @@ html[data-theme='iofusion'] main header h1 {
 }
 
 /* view navigation */
-html[data-theme='iofusion'] #navigation {
+html[data-theme^='iofusion'] #navigation {
 	gap: 1.6rem;
 }
-html[data-theme='iofusion'] #navigation button {
+html[data-theme^='iofusion'] #navigation button {
 	font-size: 1.02rem;
 	font-weight: 600;
 	letter-spacing: -0.005em;
-	color: rgba(255, 255, 255, 0.55);
+	color: var(--io-nav);
 	border-bottom: none !important;
 	transition: color 160ms ease;
 }
-html[data-theme='iofusion'] #navigation button[style*='opacity: 1'],
-html[data-theme='iofusion'] #navigation button:hover {
-	color: #fff;
+html[data-theme^='iofusion'] #navigation button[style*='opacity: 1'],
+html[data-theme^='iofusion'] #navigation button:hover {
+	color: var(--io-nav-active);
 }
-html[data-theme='iofusion'] .underline {
+html[data-theme^='iofusion'] .underline {
 	height: 2px;
 	border-radius: 2px;
 	background: linear-gradient(90deg, var(--io-accent), var(--io-accent-2)) !important;
-	box-shadow: 0 0 12px rgba(139, 156, 255, 0.55);
+	box-shadow: 0 0 12px color-mix(in srgb, var(--io-accent) 55%, transparent);
 }
 
 /* focus ring for keyboard users */
-html[data-theme='iofusion'] :focus-visible {
+html[data-theme^='iofusion'] :focus-visible {
 	outline: 2px solid var(--io-accent);
 	outline-offset: 2px;
 }
 
 /* thin scrollbars */
-html[data-theme='iofusion'] * {
+html[data-theme^='iofusion'] * {
 	scrollbar-width: thin;
-	scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+	scrollbar-color: color-mix(in srgb, var(--io-muted) 45%, transparent) transparent;
+}
+
+/* graph area fill follows the accent on the light theme (the line colour is a theme variable) */
+html[data-theme='iofusion-light'] #area-gradient stop:first-child {
+	stop-color: rgba(91, 108, 240, 0.35);
+}
+html[data-theme='iofusion-light'] #area-gradient stop:last-child {
+	stop-color: rgba(91, 108, 240, 0);
 }

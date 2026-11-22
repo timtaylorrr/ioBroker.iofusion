@@ -32,7 +32,20 @@ class IoFusion extends utils.Adapter {
 		this.on('ready', this.onReady.bind(this));
 		this.on('stateChange', (id, state) => this.stateCallbacks.forEach((cb) => cb(id, state)));
 		this.on('message', (obj) => this.onMessage(obj));
+		this.on('objectChange', (id, obj) => this.onObjectChange(id, obj));
 		this.on('unload', this.onUnload.bind(this));
+	}
+
+	/** New, changed or deleted states change the entity list; collect bursts into one refresh. */
+	onObjectChange(id, obj) {
+		if (!this.bridge || id.startsWith(`${this.namespace}.`)) return;
+		const relevant = obj ? obj.type === 'state' : this.bridge.byIobId.has(id);
+		if (!relevant) return;
+		if (obj && id.startsWith('system.')) return;
+		clearTimeout(this.refreshTimer);
+		this.refreshTimer = setTimeout(() => {
+			this.bridge.refresh().catch((error) => this.log.warn(`ioFusion: refresh failed: ${error?.message || error}`));
+		}, 3000);
 	}
 
 	/** enum.rooms / enum.functions as [{id, name, members}] */
@@ -144,6 +157,7 @@ class IoFusion extends utils.Adapter {
 		});
 		await this.bridge.init();
 		await this.subscribeForeignStatesAsync('*');
+		await this.subscribeForeignObjectsAsync('*');
 
 		const dataDir = (this.dataDir = path.join(utils.getAbsoluteInstanceDataDir(this), 'data'));
 		ensureDataDir(dataDir);
@@ -182,6 +196,7 @@ class IoFusion extends utils.Adapter {
 
 	onUnload(callback) {
 		try {
+			clearTimeout(this.refreshTimer);
 			this.bridge?.close();
 			this.server?.close();
 			this.setState('info.connection', false, true);

@@ -12,6 +12,8 @@ export interface Configuration {
 	motion?: boolean;
 	addons?: Addons;
 	token?: string;
+	/** ioFusion: a login is required, so a logout button is shown */
+	iofusionAuth?: boolean;
 }
 
 export interface Addons {

@@ -154,7 +154,12 @@
 						<div class="theme-container">
 							<div
 								class="image-area"
-								style:background-image="url('{base}/themes/{theme?.title}_thumbnail.webp')"
+								style:background-image={
+									// gradient themes (ioFusion) have no thumbnail file, so preview their background
+									String(theme?.theme?.['background-image'] ?? '').startsWith('url')
+										? `url('${base}/themes/${theme?.title}_thumbnail.webp')`
+										: theme?.theme?.['background-image']
+								}
 							></div>
 
 							<div class="description-area">
