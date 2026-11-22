@@ -15,6 +15,26 @@
 			"label": "Bind address",
 			"sm": 6
 		},
+		"authEnabled": {
+			"type": "checkbox",
+			"label": "Require login",
+			"help": "Strongly recommended. Without it everybody who can reach the port can control your devices.",
+			"sm": 12,
+			"newLine": true
+		},
+		"username": {
+			"type": "text",
+			"label": "Username",
+			"hidden": "!data.authEnabled",
+			"sm": 6,
+			"newLine": true
+		},
+		"password": {
+			"type": "password",
+			"label": "Password",
+			"hidden": "!data.authEnabled",
+			"sm": 6
+		},
 		"include": {
 			"type": "text",
 			"label": "Exposed state IDs (comma separated, * as wildcard)",

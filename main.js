@@ -8,6 +8,7 @@ const { startServer } = require('./lib/server');
 const { ensureDataDir } = require('./lib/data');
 const { nameOf } = require('./lib/entities');
 const { buildDashboard, hasViews, writeDashboard } = require('./lib/dashboard');
+const { createAuth } = require('./lib/auth');
 
 /** Turn `a.*, b.c.*` into a matcher over ioBroker ids */
 function makeFilter(patterns) {
@@ -64,7 +65,7 @@ class IoFusion extends utils.Adapter {
 
 	async onReady() {
 		this.setState('info.connection', false, true);
-		const { port, bind, include, invertCover } = this.config;
+		const { port, bind, include, invertCover, authEnabled, username, password } = this.config;
 		const matches = makeFilter(include);
 		const own = `${this.namespace}.`;
 
@@ -115,7 +116,20 @@ class IoFusion extends utils.Adapter {
 			}
 		}
 
+		let auth;
+		try {
+			auth = createAuth({ enabled: !!authEnabled, username, password, dataDir, lang: this.language, log: this.log });
+		} catch (error) {
+			// fail closed: never start an open server when a login was requested
+			this.log.error(`ioFusion: ${error.message}. The web server is not started.`);
+			return;
+		}
+		if (!auth.enabled) {
+			this.log.warn('ioFusion: login is disabled, everybody who can reach the port can control your devices');
+		}
+
 		this.server = await startServer({
+			auth,
 			port: Number(port) || 8095,
 			bind: bind || '0.0.0.0',
 			dataDir,

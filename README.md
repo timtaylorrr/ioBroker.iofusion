@@ -35,14 +35,22 @@ The button "Generate dashboard from rooms" in the instance settings rebuilds it;
 Port (default 8095), bind address and a filter for the exposed state IDs (`hm-rpc.*, 0_userdata.0.*`).
 Dashboard and settings are stored in the instance data directory, so they are part of the ioBroker backup.
 
-**Security:** there is no login yet. Anyone who can reach the port can switch every exposed state.
-Bind to a trusted network or put it behind a reverse proxy with authentication.
+## Login
+Enable "Require login" in the instance settings and set a username and password (stored encrypted by ioBroker).
+Without a username or password the adapter refuses to start the web server instead of running open.
+
+- Sign in at `/login`, sign out at `/logout`. The session lasts 30 days (cookie, `HttpOnly`, `SameSite=Lax`, `Secure` behind an https proxy).
+- Everything is behind the login: pages, the `/_api` endpoints and the WebSocket (cross-site WebSocket connections are refused).
+- Five failed attempts from one address lock the login for a minute.
+- Changing the password signs everybody out. The signing secret lives in `.session-secret` in the data directory.
+- There is one user. The connection is not encrypted by itself: use a reverse proxy with https if you expose the port outside your home network.
+- Login is off by default so existing instances keep working. The log warns while it is off.
 
 ## Development
 ```
 npm install
 npm run build:frontend   # needs Node >= 22.15 and pnpm 10
-npm run dev              # fake ioBroker on http://127.0.0.1:8095
+npm run dev              # fake ioBroker on http://127.0.0.1:8095 (DEV_AUTH=user:password enables the login)
 npm test
 ```
 `frontend/` is a copy of ha-fusion with small changes (configurable data dir, own-origin connection).

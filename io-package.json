@@ -31,8 +31,13 @@
 		"port": 8095,
 		"bind": "0.0.0.0",
 		"include": "*",
-		"invertCover": false
+		"invertCover": false,
+		"authEnabled": false,
+		"username": "",
+		"password": ""
 	},
+	"encryptedNative": ["password"],
+	"protectedNative": ["password"],
 	"objects": [],
 	"instanceObjects": [
 		{

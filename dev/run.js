@@ -9,6 +9,7 @@ const { Bridge } = require('../lib/bridge');
 const { startServer } = require('../lib/server');
 const { ensureDataDir } = require('../lib/data');
 const { buildDashboard, hasViews, writeDashboard } = require('../lib/dashboard');
+const { createAuth } = require('../lib/auth');
 
 const obj = (name, role, type, extra = {}) => ({
 	type: 'state',
@@ -102,7 +103,10 @@ const iob = {
 	const dataDir = path.join(__dirname, '.data');
 	ensureDataDir(dataDir);
 	if (!hasViews(dataDir)) writeDashboard(dataDir, buildDashboard({ registry: bridge.registry, rooms, lang: 'de' }));
-	await startServer({ port: Number(process.env.PORT) || 8095, bind: '127.0.0.1', dataDir, token, bridge });
+	// DEV_AUTH=user:password turns the login on
+	const [user, pass] = String(process.env.DEV_AUTH || '').split(':');
+	const auth = createAuth({ enabled: !!process.env.DEV_AUTH, username: user, password: pass, dataDir, lang: 'de' });
+	await startServer({ auth, port: Number(process.env.PORT) || 8095, bind: '127.0.0.1', dataDir, token, bridge });
 
 	// simulate a live sensor
 	setInterval(() => {
