@@ -21,7 +21,15 @@ Home Assistant style entities, so the frontend runs unchanged.
 Blind position: 100 is open. If your blinds use 100 for closed, enable "Invert blind position" in the instance settings.
 Thermostats expose one mode (`heat`) and a target temperature; modes, presets and schedules are not mapped yet.
 
-Not supported yet: media players, history/statistics graphs, areas (enum.rooms), todo, updates.
+Not supported yet: functions (`enum.functions`), media players, history/statistics graphs, areas (enum.rooms), todo, updates.
+
+## Rooms and automatic dashboard
+On the first start (while no dashboard exists) the adapter builds one from your ioBroker rooms (`enum.rooms`):
+one view per room, grouped into lights & switches, blinds, climate, sensors and actions. Room members can be
+states, channels or devices. A room name at the start of a device name is removed ("Wohnzimmer Licht" becomes "Licht").
+Devices without a room go to a view "Other" if there are at most 40 of them, otherwise they are left out.
+The button "Generate dashboard from rooms" in the instance settings rebuilds it; the old file is kept as
+`dashboard.yaml.bak-<time>` in the data directory.
 
 ## Settings
 Port (default 8095), bind address and a filter for the exposed state IDs (`hm-rpc.*, 0_userdata.0.*`).

@@ -8,6 +8,7 @@ const path = require('node:path');
 const { Bridge } = require('../lib/bridge');
 const { startServer } = require('../lib/server');
 const { ensureDataDir } = require('../lib/data');
+const { buildDashboard, hasViews, writeDashboard } = require('../lib/dashboard');
 
 const obj = (name, role, type, extra = {}) => ({
 	type: 'state',
@@ -76,6 +77,15 @@ const emit = (id, val) => {
 	callbacks.forEach((cb) => cb(id, stateOf(val)));
 };
 
+const rooms = [
+	{ id: 'enum.rooms.wohnzimmer', name: 'Wohnzimmer', members: ['0_userdata.0.wohnzimmer', 'hm-rpc.0.THERMO1.1', 'hm-rpc.0.BLIND1.1'] },
+	{ id: 'enum.rooms.kueche', name: 'Küche', members: ['0_userdata.0.kueche'] },
+	{ id: 'enum.rooms.flur', name: 'Flur', members: ['0_userdata.0.flur', '0_userdata.0.haustuer', 'hm-rpc.0.NEQ1001'] },
+	{ id: 'enum.rooms.bad', name: 'Bad', members: ['hm-rpc.0.NEQ2002'] },
+	{ id: 'enum.rooms.schlafzimmer', name: 'Schlafzimmer', members: ['zigbee.0.00158d0001', 'hm-rpc.0.BLIND2'] },
+	{ id: 'enum.rooms.garten', name: 'Garten', members: ['zigbee.0.00158d0002'] }
+];
+
 const iob = {
 	list: async () => Object.entries(objects).map(([id, o]) => ({ id, obj: o, state: stateOf(values[id]) })),
 	setState: async (id, val) => {
@@ -91,6 +101,7 @@ const iob = {
 	await bridge.init();
 	const dataDir = path.join(__dirname, '.data');
 	ensureDataDir(dataDir);
+	if (!hasViews(dataDir)) writeDashboard(dataDir, buildDashboard({ registry: bridge.registry, rooms, lang: 'de' }));
 	await startServer({ port: Number(process.env.PORT) || 8095, bind: '127.0.0.1', dataDir, token, bridge });
 
 	// simulate a live sensor

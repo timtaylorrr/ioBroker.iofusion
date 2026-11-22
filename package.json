@@ -4,9 +4,24 @@
 	"description": "Drag-and-drop dashboard for ioBroker, based on ha-fusion",
 	"license": "MIT",
 	"main": "main.js",
-	"keywords": ["ioBroker", "dashboard", "visualization", "ha-fusion"],
-	"engines": { "node": ">=20" },
-	"files": ["main.js", "io-package.json", "LICENSE", "admin/", "lib/", "frontend/build/", "frontend/data/"],
+	"keywords": [
+		"ioBroker",
+		"dashboard",
+		"visualization",
+		"ha-fusion"
+	],
+	"engines": {
+		"node": ">=20"
+	},
+	"files": [
+		"main.js",
+		"io-package.json",
+		"LICENSE",
+		"admin/",
+		"lib/",
+		"frontend/build/",
+		"frontend/data/"
+	],
 	"scripts": {
 		"build:frontend": "cd frontend && pnpm install && pnpm build",
 		"dev": "node dev/run.js",
@@ -14,6 +29,7 @@
 	},
 	"dependencies": {
 		"@iobroker/adapter-core": "^3.2.3",
+		"js-yaml": "^4.3.2",
 		"ws": "^8.18.0"
 	}
 }

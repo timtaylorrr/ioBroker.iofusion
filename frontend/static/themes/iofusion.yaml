@@ -35,6 +35,6 @@ theme:
   tile-border: 1px solid rgba(255, 255, 255, 0.075)
   tile-border-on: 1px solid rgba(255, 255, 255, 0.9)
   tile-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05)
-  tile-shadow-on: 0 14px 34px -12px rgba(120, 140, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25)
+  tile-shadow-on: 0 6px 16px -8px rgba(120, 140, 255, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25)
   tile-blur: blur(18px) saturate(140%)
   icon-background-off: rgba(255, 255, 255, 0.07)

@@ -22,6 +22,21 @@
 			"sm": 12,
 			"newLine": true
 		},
+		"generateDashboard": {
+			"type": "sendTo",
+			"command": "generateDashboard",
+			"label": "Generate dashboard from rooms",
+			"help": "Creates one view per ioBroker room (enum.rooms). A dashboard that already exists is kept as a backup file in the data directory.",
+			"confirm": {
+				"text": "Replace the current dashboard with one generated from your rooms?",
+				"type": "warning",
+				"ok": "Generate",
+				"cancel": "Cancel"
+			},
+			"variant": "outlined",
+			"sm": 12,
+			"newLine": true
+		},
 		"invertCover": {
 			"type": "checkbox",
 			"label": "Invert blind position (0 = open, 100 = closed)",

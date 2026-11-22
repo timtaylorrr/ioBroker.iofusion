@@ -17,6 +17,7 @@
 		"licenseInformation": { "license": "MIT", "type": "free" },
 		"platform": "Javascript/Node.js",
 		"mode": "daemon",
+		"messagebox": true,
 		"type": "visualization",
 		"compact": false,
 		"connectionType": "local",
