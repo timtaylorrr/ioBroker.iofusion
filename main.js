@@ -32,7 +32,7 @@ class IoFusion extends utils.Adapter {
 
 	async onReady() {
 		this.setState('info.connection', false, true);
-		const { port, bind, include } = this.config;
+		const { port, bind, include, invertCover } = this.config;
 		const matches = makeFilter(include);
 		const own = `${this.namespace}.`;
 
@@ -54,6 +54,7 @@ class IoFusion extends utils.Adapter {
 		const token = crypto.randomBytes(24).toString('hex');
 		this.bridge = new Bridge(iob, {
 			token,
+			invertCover,
 			log: this.log,
 			config: { latitude: this.latitude, longitude: this.longitude, language: this.language }
 		});

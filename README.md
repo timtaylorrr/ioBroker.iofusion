@@ -15,8 +15,13 @@ Home Assistant style entities, so the frontend runs unchanged.
 | `value*`, `sensor*`, `level.*` (number) | `sensor.*` (unit, device class from role) |
 | `sensor*` (boolean) | `binary_sensor.*` |
 | `button*` (boolean, writable) | `button.*` |
+| `level.temperature` (number, writable) | `climate.*` (setpoint; current temperature from a `value.temperature` state in the same channel) |
+| `level.blind`, `level.curtain`, `level.shutter` (number, writable) | `cover.*` (position, open/close/toggle; stop works if a `*stop*` button is in the same channel) |
 
-Not supported yet: climate, covers, media players, history/statistics graphs, areas (enum.rooms), todo, updates.
+Blind position: 100 is open. If your blinds use 100 for closed, enable "Invert blind position" in the instance settings.
+Thermostats expose one mode (`heat`) and a target temperature; modes, presets and schedules are not mapped yet.
+
+Not supported yet: media players, history/statistics graphs, areas (enum.rooms), todo, updates.
 
 ## Settings
 Port (default 8095), bind address and a filter for the exposed state IDs (`hm-rpc.*, 0_userdata.0.*`).

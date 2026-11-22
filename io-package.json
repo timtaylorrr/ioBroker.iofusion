@@ -29,7 +29,8 @@
 	"native": {
 		"port": 8095,
 		"bind": "0.0.0.0",
-		"include": "*"
+		"include": "*",
+		"invertCover": false
 	},
 	"objects": [],
 	"instanceObjects": [

@@ -21,6 +21,13 @@
 			"help": "Example: hm-rpc.*, zigbee.0.*, 0_userdata.0.*",
 			"sm": 12,
 			"newLine": true
+		},
+		"invertCover": {
+			"type": "checkbox",
+			"label": "Invert blind position (0 = open, 100 = closed)",
+			"help": "Home Assistant counts 100 as open. Enable this if your blinds use 100 for closed.",
+			"sm": 12,
+			"newLine": true
 		}
 	}
 }

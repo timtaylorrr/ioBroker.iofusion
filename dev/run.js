@@ -35,7 +35,14 @@ Object.assign(objects, {
 	'zigbee.0.00158d0002.temperature': obj('Garten Temperatur', 'value.temperature', 'number', { write: false, unit: '°C' }),
 	'zigbee.0.00158d0002.battery': obj('Garten Batterie', 'value.battery', 'number', { write: false, unit: '%' }),
 	'shelly.0.shellyplug#AB12.Relay0.Switch': obj('Waschmaschine', 'switch', 'boolean'),
-	'shelly.0.shellyplug#AB12.Relay0.Power': obj('Waschmaschine Leistung', 'value.power', 'number', { write: false, unit: 'W' })
+	'shelly.0.shellyplug#AB12.Relay0.Power': obj('Waschmaschine Leistung', 'value.power', 'number', { write: false, unit: 'W' }),
+	// thermostat: setpoint + measured value in the same channel
+	'hm-rpc.0.THERMO1.1.SET_POINT': obj('Wohnzimmer Heizung', 'level.temperature', 'number', { min: 6, max: 30, unit: '°C' }),
+	'hm-rpc.0.THERMO1.1.ACTUAL_TEMPERATURE': obj('Wohnzimmer Ist-Temperatur', 'value.temperature', 'number', { write: false, unit: '°C' }),
+	// blinds: position + stop button
+	'hm-rpc.0.BLIND1.1.LEVEL': obj('Wohnzimmer Rollladen', 'level.blind', 'number', { min: 0, max: 100, unit: '%' }),
+	'hm-rpc.0.BLIND1.1.STOP': obj('Wohnzimmer Rollladen Stopp', 'button.stop', 'boolean'),
+	'hm-rpc.0.BLIND2.1.LEVEL': obj('Schlafzimmer Rollladen', 'level.blind', 'number', { min: 0, max: 100, unit: '%' })
 });
 const values = {
 	'0_userdata.0.wohnzimmer.licht': true,
@@ -54,7 +61,12 @@ const values = {
 	'zigbee.0.00158d0002.temperature': 11.5,
 	'zigbee.0.00158d0002.battery': 87,
 	'shelly.0.shellyplug#AB12.Relay0.Switch': true,
-	'shelly.0.shellyplug#AB12.Relay0.Power': 412
+	'shelly.0.shellyplug#AB12.Relay0.Power': 412,
+	'hm-rpc.0.THERMO1.1.SET_POINT': 21,
+	'hm-rpc.0.THERMO1.1.ACTUAL_TEMPERATURE': 20.4,
+	'hm-rpc.0.BLIND1.1.LEVEL': 100,
+	'hm-rpc.0.BLIND1.1.STOP': false,
+	'hm-rpc.0.BLIND2.1.LEVEL': 35
 };
 
 const callbacks = [];
