@@ -39,6 +39,21 @@ Object.assign(objects, {
 	'zigbee.0.00158d0002.battery': obj('Garten Batterie', 'value.battery', 'number', { write: false, unit: '%' }),
 	'shelly.0.shellyplug#AB12.Relay0.Switch': obj('Waschmaschine', 'switch', 'boolean'),
 	'shelly.0.shellyplug#AB12.Relay0.Power': obj('Waschmaschine Leistung', 'value.power', 'number', { write: false, unit: 'W' }),
+	// light with switch + brightness + color in one channel (becomes ONE entity)
+	'zigbee.0.00158d0001.color': obj('Schlafzimmer Farbe', 'level.color.rgb', 'string'),
+	'zigbee.0.00158d0001.colortemp': obj('Schlafzimmer Farbtemperatur', 'level.color.temperature', 'number', { min: 153, max: 500, unit: 'mired' }),
+	// media player (sonos style)
+	'sonos.0.root.WZ.state': obj('Wohnzimmer Sonos', 'media.state', 'string'),
+	'sonos.0.root.WZ.play': obj('Play', 'button.play', 'boolean'),
+	'sonos.0.root.WZ.pause': obj('Pause', 'button.pause', 'boolean'),
+	'sonos.0.root.WZ.next': obj('Next', 'button.next', 'boolean'),
+	'sonos.0.root.WZ.prev': obj('Prev', 'button.prev', 'boolean'),
+	'sonos.0.root.WZ.volume': obj('Volume', 'level.volume', 'number', { min: 0, max: 100 }),
+	'sonos.0.root.WZ.current_title': obj('Titel', 'media.title', 'string', { write: false }),
+	'sonos.0.root.WZ.current_artist': obj('Künstler', 'media.artist', 'string', { write: false }),
+	// indicators
+	'zigbee.0.00158d0002.lowbat': obj('Garten Batterie schwach', 'indicator.maintenance.lowbat', 'boolean', { write: false }),
+	'zigbee.0.00158d0002.available': obj('Garten erreichbar', 'indicator.reachable', 'boolean', { write: false }),
 	// thermostat: setpoint + measured value in the same channel
 	'hm-rpc.0.THERMO1.1.SET_POINT': obj('Wohnzimmer Heizung', 'level.temperature', 'number', { min: 6, max: 30, unit: '°C' }),
 	'hm-rpc.0.THERMO1.1.ACTUAL_TEMPERATURE': obj('Wohnzimmer Ist-Temperatur', 'value.temperature', 'number', { write: false, unit: '°C' }),
@@ -69,6 +84,18 @@ const values = {
 	'zigbee.0.00158d0002.battery': 87,
 	'shelly.0.shellyplug#AB12.Relay0.Switch': true,
 	'shelly.0.shellyplug#AB12.Relay0.Power': 412,
+	'zigbee.0.00158d0001.color': '#ff8a3d',
+	'zigbee.0.00158d0001.colortemp': 370,
+	'sonos.0.root.WZ.state': 'play',
+	'sonos.0.root.WZ.play': false,
+	'sonos.0.root.WZ.pause': false,
+	'sonos.0.root.WZ.next': false,
+	'sonos.0.root.WZ.prev': false,
+	'sonos.0.root.WZ.volume': 30,
+	'sonos.0.root.WZ.current_title': 'Weightless',
+	'sonos.0.root.WZ.current_artist': 'Marconi Union',
+	'zigbee.0.00158d0002.lowbat': false,
+	'zigbee.0.00158d0002.available': true,
 	'hm-rpc.0.THERMO1.1.SET_POINT': 21,
 	'hm-rpc.0.THERMO1.1.ACTUAL_TEMPERATURE': 20.4,
 	'hm-rpc.0.BLIND1.1.LEVEL': 100,
@@ -84,7 +111,7 @@ const emit = (id, val) => {
 };
 
 const rooms = [
-	{ id: 'enum.rooms.wohnzimmer', name: 'Wohnzimmer', members: ['0_userdata.0.wohnzimmer', 'hm-rpc.0.THERMO1.1', 'hm-rpc.0.BLIND1.1'] },
+	{ id: 'enum.rooms.wohnzimmer', name: 'Wohnzimmer', members: ['0_userdata.0.wohnzimmer', 'hm-rpc.0.THERMO1.1', 'hm-rpc.0.BLIND1.1', 'sonos.0.root.WZ'] },
 	{ id: 'enum.rooms.kueche', name: 'Küche', members: ['0_userdata.0.kueche'] },
 	{ id: 'enum.rooms.flur', name: 'Flur', members: ['0_userdata.0.flur', '0_userdata.0.haustuer', 'hm-rpc.0.NEQ1001'] },
 	{ id: 'enum.rooms.bad', name: 'Bad', members: ['hm-rpc.0.NEQ2002'] },
@@ -111,6 +138,11 @@ const iob = {
 	setState: async (id, val) => {
 		console.log('[mock] setState', id, val);
 		emit(id, val);
+		// like a real player: transport buttons change the media state
+		if (id.startsWith('sonos.0.root.WZ.') && val === true) {
+			const next = { play: 'play', pause: 'pause' }[id.split('.').pop()];
+			if (next) emit('sonos.0.root.WZ.state', next);
+		}
 	},
 	onStateChange: (cb) => callbacks.push(cb)
 };
