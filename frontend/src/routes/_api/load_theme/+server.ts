@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import { json, error } from '@sveltejs/kit';
-import { dev } from '$app/environment';
 import * as yaml from 'js-yaml';
+import { clientDir } from '$lib/server/paths';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -9,7 +9,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const body = await request.json();
 
 		const file = await readFile(
-			`${dev ? 'static' : 'build/client'}/themes/${body?.theme}.yaml`,
+			`${clientDir}/themes/${body?.theme}.yaml`,
 			'utf8'
 		);
 		const content = yaml.load(file);

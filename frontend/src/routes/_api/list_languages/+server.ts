@@ -1,12 +1,12 @@
 import { readdir } from 'fs/promises';
 import { json, error } from '@sveltejs/kit';
-import { dev } from '$app/environment';
 import path from 'path';
+import { clientDir } from '$lib/server/paths';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ setHeaders }) => {
 	try {
-		const dir = dev ? './static/translations' : './build/client/translations';
+		const dir = `${clientDir}/translations`;
 		const files = await readdir(dir);
 		const languages = files
 			.filter((file) => path.extname(file) === '.json')

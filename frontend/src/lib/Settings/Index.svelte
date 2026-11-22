@@ -24,6 +24,9 @@
 		languages: { id: string; label: string }[];
 	} = $props();
 
+	// ioFusion: the access token, the update check and the Home Assistant log out do not apply
+	let isAdapter = $derived(!!data?.configuration?.iofusion);
+
 	let formElement: HTMLFormElement = $state(undefined as any);
 	let timeout: ReturnType<typeof setTimeout> | null;
 	let responseCode: number | undefined = $state(undefined);
@@ -129,11 +132,15 @@
 		>
 			<Language {languages} />
 
-			<Token />
+			{#if !isAdapter}
+				<Token />
+			{/if}
 
 			<Addons {data} />
 
-			<Version />
+			{#if !isAdapter}
+				<Version />
+			{/if}
 
 			<CustomJs />
 
@@ -141,7 +148,9 @@
 
 			<Motion />
 
-			<Logout />
+			{#if !isAdapter}
+				<Logout />
+			{/if}
 
 			<div class="buttons">
 				<div class="save-container">

@@ -1,8 +1,8 @@
 import { readdir, readFile } from 'fs/promises';
-import { dev } from '$app/environment';
 import { json, error } from '@sveltejs/kit';
 import * as yaml from 'js-yaml';
 import path from 'path';
+import { clientDir } from '$lib/server/paths';
 import type { RequestHandler } from './$types';
 
 interface ThemeData {
@@ -14,7 +14,7 @@ interface ThemeData {
 
 export const GET: RequestHandler = async ({ setHeaders }) => {
 	try {
-		const dir = dev ? './static/themes' : './build/client/themes';
+		const dir = `${clientDir}/themes`;
 		const files = await readdir(dir);
 		const yamlFiles = files.filter((file) => file.endsWith('.yaml'));
 

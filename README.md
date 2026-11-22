@@ -57,6 +57,14 @@ npm test
 
 ## Changelog
 
+### 0.3.0
+- Tap toggles a device, a long press opens its detail dialog (no more extra click)
+- Entity picker: flat search with several words ("licht eg küche"), tree without search, merged single-child levels, opened groups scroll into view
+- Fixed the settings dialog (it spun forever) and all other routes that looked for static files in the wrong folder; token, update check and Home Assistant log out are hidden in the adapter
+- `homeassistant.toggle/turn_on/turn_off` are supported (switch dialog, scenes)
+- The old default theme "godis" is replaced by "iofusion" once; the WebSocket token survives restarts
+- Adapter log shows service calls (debug) and refused connections (warn)
+
 ### 0.2.0
 - Rooms and automatic dashboard (`enum.rooms`, optional grouping by `enum.functions`)
 - Login with cookie sessions

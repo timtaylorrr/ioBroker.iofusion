@@ -1,12 +1,12 @@
 import { readdir, readFile } from 'fs/promises';
-import { dev } from '$app/environment';
 import { json, error } from '@sveltejs/kit';
 import { marked } from 'marked';
+import { clientDir } from '$lib/server/paths';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ setHeaders }) => {
 	try {
-		const dir = dev ? './static/documentation' : './build/client/documentation';
+		const dir = `${clientDir}/documentation`;
 		const files = await readdir(dir);
 		const mdFiles = files.filter((file) => file.endsWith('.md'));
 

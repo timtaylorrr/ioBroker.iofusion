@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises';
-import { dev } from '$app/environment';
 import * as yaml from 'js-yaml';
 import type { Configuration, Dashboard, Translations } from '$lib/Types';
 import dotenv from 'dotenv';
+import { clientDir } from '$lib/server/paths';
 
 dotenv.config();
 
@@ -53,14 +53,17 @@ export async function load({ request }): Promise<{
 		(host ? `${proto}://${host}` : new URL(request.url).origin);
 
 	// ioFusion adapter: access token for the built-in bridge
-	if (process.env.IOFUSION_TOKEN) configuration.token = process.env.IOFUSION_TOKEN;
+	if (process.env.IOFUSION_TOKEN) {
+		configuration.token = process.env.IOFUSION_TOKEN;
+		configuration.iofusion = true;
+	}
 	if (process.env.IOFUSION_AUTH === '1') configuration.iofusionAuth = true;
 
 	// initialize keys if missing
 	dashboard.views = dashboard.views || [];
 	dashboard.sidebar = dashboard.sidebar || [];
 
-	const dir = dev ? './static' : process.env.CLIENT_DIR || './build/client';
+	const dir = clientDir;
 
 	// load theme and locale
 	const [theme, en, locale] = await Promise.all([

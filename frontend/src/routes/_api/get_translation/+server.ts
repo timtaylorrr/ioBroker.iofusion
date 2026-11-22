@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import { json, error } from '@sveltejs/kit';
-import { dev } from '$app/environment';
+import { clientDir } from '$lib/server/paths';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, setHeaders }) => {
@@ -11,7 +11,7 @@ export const POST: RequestHandler = async ({ request, setHeaders }) => {
 			throw new Error('Invalid locale');
 		}
 
-		const dir = dev ? './static/translations' : './build/client/translations';
+		const dir = `${clientDir}/translations`;
 
 		const [en, locale] = await Promise.all([
 			readFile(`${dir}/en.json`, 'utf8'),

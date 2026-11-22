@@ -571,6 +571,44 @@
 	});
 
 	// Brightness slider functions
+	// ioFusion: tap toggles, a long press opens the detail dialog (brightness, colour, ...)
+	const LONG_PRESS_MS = 450;
+	let pressTimer: ReturnType<typeof setTimeout> | undefined;
+	let pressStart = { x: 0, y: 0 };
+	let longPressed = false;
+
+	function cancelPress() {
+		clearTimeout(pressTimer);
+		pressTimer = undefined;
+	}
+
+	function pressDown(event: PointerEvent) {
+		handlePointer();
+		longPressed = false;
+		if ($editMode || isDisplayOnly || more_info === false) return;
+		pressStart = { x: event.clientX, y: event.clientY };
+		cancelPress();
+		pressTimer = setTimeout(() => {
+			pressTimer = undefined;
+			if (isSliding) return;
+			longPressed = true;
+			openEntityModal();
+		}, LONG_PRESS_MS);
+	}
+
+	function pressMove(event: PointerEvent) {
+		if (pressTimer && Math.hypot(event.clientX - pressStart.x, event.clientY - pressStart.y) > 10) {
+			cancelPress();
+		}
+	}
+
+	/** true if this click only ended a long press and must not toggle as well */
+	function swallowClick(): boolean {
+		if (!longPressed) return false;
+		longPressed = false;
+		return true;
+	}
+
 	function handleSlideStart(event: PointerEvent | MouseEvent | TouchEvent) {
 		if (!isLightWithBrightness || isDisplayOnly || $editMode) return;
 
@@ -693,7 +731,15 @@
 			: ''}
 	style:min-height="{$itemHeight}px"
 	onpointerenter={handlePointer}
-	onpointerdown={handlePointer}
+	onpointerdown={pressDown}
+	onpointermove={pressMove}
+	onpointerup={cancelPress}
+	onpointerleave={cancelPress}
+	onpointercancel={cancelPress}
+	oncontextmenu={(event) => {
+		// no browser menu on a long press of a tile
+		if (!$editMode && !isDisplayOnly) event.preventDefault();
+	}}
 	use:Ripple={{
 		...$ripple,
 		color: !$editMode
@@ -709,7 +755,10 @@
 		class="left"
 		onclick={(e) => {
 			e.stopPropagation();
-			if (!isDisplayOnly) handleEvent(e);
+			if (swallowClick()) return;
+			if (isDisplayOnly) return;
+			if ($editMode) handleEvent(e);
+			else toggle();
 		}}
 		role="button"
 		tabindex={isDisplayOnly ? -1 : 0}
@@ -756,7 +805,7 @@
 		class="right"
 		onclick={(event) => {
 			event.stopPropagation();
-			if (isSliding) return;
+			if (isSliding || swallowClick()) return;
 			if (!$editMode) {
 				if (!isDisplayOnly) {
 					toggle();
@@ -850,6 +899,10 @@
 		grid-auto-flow: row;
 		grid-template-areas: 'left right';
 		--container-padding: 0.72rem;
+
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		user-select: none;
 
 		/* fix ripple */
 		transform: translateZ(0);

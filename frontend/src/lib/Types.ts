@@ -14,6 +14,8 @@ export interface Configuration {
 	token?: string;
 	/** ioFusion: a login is required, so a logout button is shown */
 	iofusionAuth?: boolean;
+	/** ioFusion: served by the ioBroker adapter */
+	iofusion?: boolean;
 }
 
 export interface Addons {

@@ -1,8 +1,12 @@
 {
 	"common": {
 		"name": "iofusion",
-		"version": "0.2.0",
+		"version": "0.3.0",
 		"news": {
+			"0.3.0": {
+				"en": "Tap toggles, long press opens details; entity picker with flat search and tree; fixed settings dialog and static file paths; stable WebSocket token; new theme applied automatically; homeassistant.* services; logging for service calls",
+				"de": "Tippen schaltet, langes Drücken öffnet Details; Entity-Auswahl mit flacher Suche und Baum; Einstellungsdialog und Dateipfade repariert; stabiles WebSocket-Token; neues Theme wird automatisch übernommen; homeassistant.*-Dienste; Logging für Dienstaufrufe"
+			},
 			"0.2.0": {
 				"en": "Rooms and automatic dashboard, login, climate, blinds, media players, colour lights, history graphs, notifications, light theme",
 				"de": "Räume und automatisches Dashboard, Login, Klima, Rollläden, Medienwiedergabe, Farblicht, Verlaufsgraphen, Benachrichtigungen, helles Theme"

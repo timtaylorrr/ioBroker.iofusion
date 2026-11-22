@@ -48,7 +48,7 @@
 	let scrollToAlignment = $state<Alignment>('auto');
 	const scrollToBehaviour: ScrollBehaviour = 'instant';
 	const itemSize = 50;
-	const maxHeight = itemSize * 7;
+	const maxHeight = itemSize * 8;
 	const overscanCount = 7;
 
 	let previousValue = $state(value);
@@ -71,10 +71,16 @@
 	let filter = $derived(
 		options && listOpen
 			? options.filter(
-					(option: { id: string; label: string }) =>
-						!search ||
-						option.label.toLowerCase().includes(search.toLowerCase()) ||
-						option.id.toLowerCase().includes(search.toLowerCase())
+					(option: { id: string; label: string; hint?: string }) => {
+						if (!search) return true;
+						// every word must appear in the name or the id ("licht eg küche")
+						const haystack = `${option.label} ${option.id} ${option.hint ?? ''}`.toLowerCase();
+						return search
+							.toLowerCase()
+							.split(/\s+/)
+							.filter(Boolean)
+							.every((word) => haystack.includes(word));
+					}
 				)
 			: []
 	);
@@ -90,6 +96,21 @@
 	let rows = $derived.by<Row[]>(() => {
 		if (!filter) return [];
 		if (!grouped) return filter.map((option) => ({ kind: 'option', option, depth: 0 }));
+		// searching: a flat list of hits (full ioBroker id as hint) beats a tree full of headers
+		if (search) {
+			const q = search.toLowerCase().trim();
+			// names that start with the search first, then names that contain it, then id matches
+			const rank = (o: Opt) => {
+				const label = o.label.toLowerCase();
+				return label.startsWith(q) ? 0 : label.includes(q) ? 1 : 2;
+			};
+			return [...filter]
+				.sort(
+					(a, b) =>
+						rank(a) - rank(b) || (a.hint ?? a.id).localeCompare(b.hint ?? b.id, undefined, { numeric: true })
+				)
+				.map((option) => ({ kind: 'option', option, depth: 0 }));
+		}
 
 		// build the tree
 		const root: TreeNode = { children: new Map(), options: [], count: 0 };
@@ -118,9 +139,17 @@
 		const emit = (node: TreeNode, prefix: string, depth: number) => {
 			node.options.sort((a, b) => a.label.localeCompare(b.label));
 			for (const option of node.options) result.push({ kind: 'option', option, depth });
-			for (const name of [...node.children.keys()].sort((a, b) => a.localeCompare(b))) {
-				const child = node.children.get(name)!;
-				const path = prefix ? `${prefix}.${name}` : name;
+			for (const key of [...node.children.keys()].sort((a, b) => a.localeCompare(b))) {
+				let child = node.children.get(key)!;
+				let name = key;
+				let path = prefix ? `${prefix}.${key}` : key;
+				// a chain of levels without own entries becomes one row ("a › b › c")
+				while (child.children.size === 1 && child.options.length === 0) {
+					const [next, nextNode] = [...child.children][0];
+					name = `${name} › ${next}`;
+					path = `${path}.${next}`;
+					child = nextNode;
+				}
 				const open =
 					!!search ||
 					!!expanded[path] ||
@@ -133,9 +162,19 @@
 		emit(root, '', 0);
 		return result;
 	});
-	function toggleGroup(path: string) {
+	async function toggleGroup(path: string) {
 		const row = rows.find((r) => r.kind === 'header' && r.path === path);
-		expanded[path] = row?.kind === 'header' ? !row.open : true;
+		const opening = row?.kind === 'header' ? !row.open : true;
+		expanded[path] = opening;
+		if (!opening) return;
+		// bring the opened group to the top so its entries are visible
+		await tick();
+		const index = rows.findIndex((r) => r.kind === 'header' && r.path === path);
+		if (index === -1) return;
+		scrollToAlignment = 'start';
+		scrollToIndex = index;
+		await tick();
+		scrollToAlignment = 'auto';
 	}
 	function pick(index: number) {
 		const row = rows[index];

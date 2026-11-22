@@ -62,6 +62,24 @@ Object.assign(objects, {
 	'hm-rpc.0.BLIND1.1.STOP': obj('Wohnzimmer Rollladen Stopp', 'button.stop', 'boolean'),
 	'hm-rpc.0.BLIND2.1.LEVEL': obj('Schlafzimmer Rollladen', 'level.blind', 'number', { min: 0, max: 100, unit: '%' })
 });
+// MOCK_BIG=1 adds ~3000 KNX style states (knx.0.<Funktion>.<Etage>.<Name>) to try big installations
+const bigValues = {};
+if (process.env.MOCK_BIG) {
+	const functions = [['Licht_schalten', 'switch.light', 'boolean', false], ['Steckdose_schalten', 'switch', 'boolean', false], ['Licht_dimmen', 'level.dimmer', 'number', false], ['Jalousie_Position', 'level.blind', 'number', false], ['Temperatur_Ist', 'value.temperature', 'number', true], ['Fenster_Status', 'sensor.window', 'boolean', true]];
+	const floors = ['UG', 'EG', 'OG', 'DG'];
+	const names = ['Küche', 'Wohnzimmer', 'Esszimmer', 'Flur', 'Bad', 'Gäste_WC', 'Büro', 'Schlafzimmer', 'Kinderzimmer', 'Garage', 'Terrasse', 'Keller', 'Hauswirtschaft', 'Treppe', 'Gartenhaus'];
+	for (const [fn, role, type, readOnly] of functions) {
+		for (const floor of floors) {
+			for (let i = 0; i < 125; i++) {
+				const name = `${names[i % names.length]}_${Math.floor(i / names.length) + 1}`;
+				const id = `knx.0.${fn}.${floor}.${fn.split('_')[0]}_${floor}_${name}`;
+				objects[id] = obj(`${fn.split('_')[0]} ${floor} ${name.replace(/_/g, ' ')}`, role, type, { write: !readOnly, ...(type === 'number' ? { min: 0, max: 100 } : {}) });
+				bigValues[id] = type === 'boolean' ? false : 0;
+			}
+		}
+	}
+}
+
 // history is enabled for these states in the fake history.0 instance
 for (const id of ['0_userdata.0.wohnzimmer.temperatur', '0_userdata.0.wohnzimmer.feuchte', 'hm-rpc.0.NEQ2002.1.TEMPERATURE', 'zigbee.0.00158d0002.temperature', 'shelly.0.shellyplug#AB12.Relay0.Power']) {
 	objects[id].common.custom = { 'history.0': { enabled: true } };
@@ -102,6 +120,7 @@ const values = {
 	'hm-rpc.0.BLIND1.1.STOP': false,
 	'hm-rpc.0.BLIND2.1.LEVEL': 35
 };
+Object.assign(values, bigValues);
 
 const callbacks = [];
 const stateOf = (val) => ({ val, ack: true, ts: Date.now(), lc: Date.now() });
